@@ -18,6 +18,26 @@ const scrollToSection = (sectionId: string) => {
   }
 };
 
+// Static product data
+const staticProducts = [
+  {
+    id: 1,
+    name: "Misubi Regular",
+    description: "The original favorite — simple, tasty, and perfectly satisfying.",
+    price: 45,
+    quantity: 50,
+    image_path: "/assets/images/product-1760518250931-100113996.jpg"
+  },
+  {
+    id: 2,
+    name: "Misubi with Egg",
+    description: "A twist on the classic — topped with a fluffy egg for an extra layer of flavor and heartiness.",
+    price: 55,
+    quantity: 30,
+    image_path: "/assets/images/product-1760519137859-502885312.jpg"
+  }
+];
+
 interface Product {
   id: number;
   name: string;
@@ -28,26 +48,8 @@ interface Product {
 }
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch('/api/products');
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [products] = useState<Product[]>(staticProducts);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-black font-sans">
@@ -69,7 +71,6 @@ export default function Home() {
           <button onClick={() => scrollToSection('about')} className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">About</button>
           <button onClick={() => scrollToSection('products')} className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">Products</button>
           <button onClick={() => scrollToSection('contact')} className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">Contact</button>
-          <a href="/admin/login" className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">Admin</a>
         </nav>
       </header>
 
