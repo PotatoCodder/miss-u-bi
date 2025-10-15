@@ -4,7 +4,8 @@ import { sql } from '@vercel/postgres';
 type Database = any;
 
 // Check if we're in development (local) or production (Vercel)
-const isProduction = process.env.NODE_ENV === 'production';
+// Vercel sets NODE_ENV to 'production', but we can also check for Vercel-specific env vars
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
 // For local development, we'll still use SQLite
 let db: Database | typeof sql;
@@ -62,8 +63,45 @@ if (!isProduction) {
   insertAdmin.run('admin', hashedPassword);
 } else {
   // PostgreSQL setup for production
-  // Note: You'll need to run these manually in Vercel Postgres or create a migration script
-  console.log('Production mode: Make sure to create tables in Vercel Postgres');
+  // Create tables if they don't exist
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS admins (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        price INTEGER NOT NULL,
+        quantity INTEGER NOT NULL DEFAULT 0,
+        image_path TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Insert default admin user
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = bcrypt.hashSync('admin123', 10);
+
+    await sql`
+      INSERT INTO admins (username, password_hash)
+      VALUES ('admin', ${hashedPassword})
+      ON CONFLICT (username) DO NOTHING;
+    `;
+
+    console.log('Database initialized successfully in production');
+  } catch (error) {
+    console.error('Error initializing production database:', error);
+  }
 }
 
 // Database query functions
@@ -101,7 +139,7 @@ export const dbStatements = {
     ? db.prepare('INSERT INTO products (name, description, price, quantity, image_path) VALUES (?, ?, ?, ?, ?)')
     : async (name: string, description: string, price: number, quantity: number, imagePath: string | null) => {
         const result = await sql`INSERT INTO products (name, description, price, quantity, image_path) VALUES (${name}, ${description}, ${price}, ${quantity}, ${imagePath}) RETURNING id`;
-        return { lastInsertRowid: result.rows[0].id };
+        return { lastInsertRowid: result.rows[0]?.id || 1 };
       },
 
   updateProduct: !isProduction
