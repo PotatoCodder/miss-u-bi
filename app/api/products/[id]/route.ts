@@ -32,7 +32,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const result = dbStatements.updateProduct.run(name, description, price, quantity, image_path || null, id);
+    const result = await dbStatements.updateProduct(name, description, price, quantity, image_path || null, id);
 
     if (result.changes === 0) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
@@ -58,7 +58,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const result = dbStatements.deleteProduct.run(id);
+    const result = await dbStatements.deleteProduct(id);
 
     if (result.changes === 0) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });

@@ -50,6 +50,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     checkAuth();
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = () => {
@@ -224,6 +225,7 @@ export default function AdminDashboard() {
                       cy="50%"
                       outerRadius={80}
                       dataKey="value"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
                       {pieChartData.map((entry, index) => (

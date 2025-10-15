@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get admin from database
-    const admin = dbStatements.getAdminByUsername.get(username) as { id: number; username: string; password_hash: string } | undefined;
+    const admin = await dbStatements.getAdminByUsername(username) as { id: number; username: string; password_hash: string } | undefined;
 
     if (!admin) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
