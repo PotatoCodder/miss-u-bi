@@ -1,103 +1,285 @@
+'use client';
+
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import logo from "@/assets/images/logo.jpg";
+
+// Smooth scroll function
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+};
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  image_path?: string;
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-black font-sans">
+      {/* Header */}
+      <header className="flex justify-between items-center px-6 py-4 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-md">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src={logo}
+              alt="Miss U Bi Logo"
+              width={24}
+              height={24}
+              className="rounded-full"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+          <h1 className="text-xl font-bold text-black">Miss U Bi</h1>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <nav className="hidden md:flex space-x-6">
+          <button onClick={() => scrollToSection('about')} className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">About</button>
+          <button onClick={() => scrollToSection('products')} className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">Products</button>
+          <button onClick={() => scrollToSection('contact')} className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">Contact</button>
+          <a href="/admin/login" className="text-black hover:text-yellow-500 font-medium transition-colors duration-200 text-sm">Admin</a>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <motion.section
+        id="about"
+        className="text-center py-32 px-6 bg-gradient-to-br from-white to-gray-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <motion.h2
+            className="text-5xl md:text-7xl font-bold mb-6 text-black tracking-tight"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Spam Musubi
+          </motion.h2>
+          <motion.p
+            className="text-2xl md:text-3xl text-yellow-500 mb-10 font-semibold"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            The snack you love to TRY!
+          </motion.p>
+          <motion.p
+            className="text-lg max-w-3xl mx-auto mb-12 text-gray-600 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            Spam musubi originated in Hawaii. It is considered as a snack, light meal, and even as lunch.
+            It is a popular grab-to-go food due to its portability. Why not try a taste of our very own
+            Miss U Bi that is a blend of American and Japanese influences!
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+          >
+            <Button className="bg-black text-white hover:bg-gray-900 px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              Order Now
+            </Button>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Products Section */}
+      <motion.section
+        id="products"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="py-24 px-6 bg-gray-50"
+      >
+        <motion.h3
+          className="text-4xl font-bold text-center mb-16 text-black"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Our Products
+        </motion.h3>
+        <div className="max-w-6xl mx-auto">
+          {loading ? (
+            <div className="grid md:grid-cols-2 gap-12">
+              {[...Array(4)].map((_, i) => (
+                <Card key={i} className="bg-white border border-gray-200">
+                  <CardContent className="p-8">
+                    <div className="w-full h-56 bg-gray-200 animate-pulse mb-6 rounded-lg"></div>
+                    <div className="h-8 bg-gray-200 animate-pulse mb-3 rounded"></div>
+                    <div className="h-4 bg-gray-200 animate-pulse mb-2 rounded"></div>
+                    <div className="h-4 bg-gray-200 animate-pulse mb-6 rounded w-3/4"></div>
+                    <div className="h-8 bg-gray-200 animate-pulse rounded w-1/2"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-12">
+              {products.map((product) => (
+                <Card key={product.id} className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                  <CardContent className="p-8">
+                    <div className="relative overflow-hidden rounded-lg mb-6">
+                      <Image
+                        src={product.image_path || "/assets/images/logo.jpg"}
+                        alt={product.name}
+                        width={300}
+                        height={200}
+                        className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
+                        unoptimized
+                      />
+                    </div>
+                    <CardTitle className="text-2xl font-bold mb-3 text-black">{product.name}</CardTitle>
+                    <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
+                    <div className="flex justify-between items-center">
+                      <p className="text-3xl font-bold text-red-500">₱{product.price}</p>
+                      <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                        {product.quantity} in stock
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="bg-white border border-gray-200">
+              <CardContent className="p-12 text-center">
+                <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-black mb-4">No Products Available</h3>
+                <p className="text-gray-600 mb-6">
+                  Products will be displayed here once added by the administrator.
+                </p>
+                <p className="text-sm text-gray-500">
+                  Visit the admin dashboard to add products.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </motion.section>
+
+      {/* Contact Section */}
+      <motion.section
+        id="contact"
+        className="py-24 px-6 bg-white"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-4xl font-bold text-center mb-16 text-black">Contact Us</h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl text-black flex items-center">
+                  <svg className="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  Phone
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-lg text-gray-600 font-medium">09553240266</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl text-black flex items-center">
+                  <svg className="w-6 h-6 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  Facebook
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <a
+                  href="https://www.facebook.com/profile.php?id=61580429570710"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 text-lg hover:text-blue-800 font-medium transition-colors duration-200"
+                >
+                  Miss U Bi
+                </a>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="text-center mt-12">
+            <p className="text-gray-600 text-lg">
+              Follow us on Facebook for updates and special offers!
+            </p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Footer */}
+      <motion.footer
+        className="bg-black text-white py-16 px-6"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex items-center justify-center space-x-4 mb-6">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+              <Image
+                src={logo}
+                alt="Miss U Bi Logo"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+            </div>
+            <h3 className="text-xl font-bold">Miss U Bi</h3>
+          </div>
+          <p className="text-gray-300 mb-4">&copy; 2025 Miss U Bi. All rights reserved.</p>
+          <p className="text-sm text-gray-400">Made with ❤️ for spam musubi lovers</p>
+        </div>
+      </motion.footer>
     </div>
   );
 }
